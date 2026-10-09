@@ -83,7 +83,7 @@
 
 **เตรียมตอบ:** Dice คืออะไร? ทำไมใช้ BCE + Dice? ทำไม glioma ยากที่สุด? ทำไม multi-task ไม่ช่วย segmentation?
 
-## 4) โมเดล Multi-task และการทดลอง
+## 4) โมเดล Multi-task และการทดลอง "GUY"
 
 **ศึกษา**
 - [ ] RESULTS.md หัวข้อ 3 "Method" และ 4 "Experiments"

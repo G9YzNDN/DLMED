@@ -34,7 +34,7 @@ segmentation equal (Dice 0.774 vs 0.775). Equal loss weights beat learned (uncer
 
 - [ ] Everyone reads RESULTS.md and reviews their part
 - [ ] Meet as a group and make the slides together (slide order in TASKS.md)
-- [ ] Merge slides, rehearse twice with a timer, practise the Q&A list
+- [ ] Rehearse twice with a timer, practise the Q&A list
 
 ## Notes
 

@@ -1,0 +1,21 @@
+# Data and outputs (large; keep these in Google Drive)
+data/
+runs/
+*.mat
+*.zip
+*.pt
+*.pth
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

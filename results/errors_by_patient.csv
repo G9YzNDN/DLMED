@@ -1,0 +1,32 @@
+experiment,patient,class_name,slices_x_seeds,errors,predicted_as,share_of_all_errors
+A_cls,103673,meningioma,54,54,pituitary (54),0.607
+A_cls,95142,glioma,27,7,"pituitary (6), meningioma (1)",0.079
+A_cls,92897,glioma,12,6,meningioma (6),0.067
+A_cls,113098,meningioma,12,4,glioma (4),0.045
+A_cls,113554,meningioma,30,3,glioma (3),0.034
+A_cls,106442,meningioma,30,3,glioma (3),0.034
+A_cls,104558,pituitary,72,3,meningioma (3),0.034
+A_cls,108514,meningioma,54,3,glioma (3),0.034
+A_cls,102818,meningioma,12,2,glioma (2),0.022
+A_cls,108479,glioma,6,2,pituitary (2),0.022
+A_cls,111710,meningioma,6,1,glioma (1),0.011
+A_cls,97374,meningioma,15,1,glioma (1),0.011
+C_mtl_equal,103673,meningioma,54,54,pituitary (54),0.857
+C_mtl_equal,104558,pituitary,72,2,meningioma (2),0.032
+C_mtl_equal,108514,meningioma,54,2,glioma (2),0.032
+C_mtl_equal,113098,meningioma,12,2,glioma (2),0.032
+C_mtl_equal,113554,meningioma,30,1,glioma (1),0.016
+C_mtl_equal,95142,glioma,27,1,pituitary (1),0.016
+C_mtl_equal,MR040240,glioma,291,1,pituitary (1),0.016
+D_mtl_uncert,103673,meningioma,54,54,pituitary (54),0.692
+D_mtl_uncert,102818,meningioma,12,5,pituitary (5),0.064
+D_mtl_uncert,113098,meningioma,12,4,"pituitary (3), glioma (1)",0.051
+D_mtl_uncert,104558,pituitary,72,3,meningioma (3),0.038
+D_mtl_uncert,108514,meningioma,54,3,glioma (3),0.038
+D_mtl_uncert,113554,meningioma,30,2,glioma (2),0.026
+D_mtl_uncert,MR040240,glioma,291,2,pituitary (2),0.026
+D_mtl_uncert,106442,meningioma,30,1,glioma (1),0.013
+D_mtl_uncert,110537,pituitary,39,1,meningioma (1),0.013
+D_mtl_uncert,109411,meningioma,9,1,glioma (1),0.013
+D_mtl_uncert,108479,glioma,6,1,pituitary (1),0.013
+D_mtl_uncert,95142,glioma,27,1,pituitary (1),0.013

@@ -1,117 +1,137 @@
-# Team Tasks (6 people)
+# Team Plan — Review, Slides, Presentation
 
-The starter code already runs end to end (data prep → train → evaluate → summary table).
-Each person **owns** one part: check it, improve it, run its experiments, write its slides and present it.
-Everyone must understand the whole pipeline for the Q&A (3 of the 15 points).
+**Status: the project is finished.** Headline: multi-task learning improved classification (Macro-F1 0.916 → 0.938) and kept segmentation equal (Dice ≈ 0.775). Data, code, all experiments, test results and figures are in this repo.
+Our job now: **(1) understand and check** our part, **(2) make our slides**, **(3) present and answer questions.**
 
-## Order of work
+You do **not** need to run any code. Everything you need is on GitHub:
 
-```
-Phase 1  Data ready        Person 1 makes splits.csv + processed.zip   (everyone waits on this)
-         Sanity check      Person 4 trains 2-3 epochs to prove the pipeline works on Colab
-Phase 2  Freeze settings   Person 4 tunes lr / epochs on VALIDATION with experiment C, then settings are locked
-Phase 3  Run experiments   A (P2), B (P3), C + D (P4), each x 3 seeds, all with the locked settings
-                           Final runs are executed on Guy's laptop (see "Compute" below)
-Phase 4  Evaluate          Person 5 builds the comparison table and error analysis
-Phase 5  Slides + rehearse Person 6 assembles, everyone presents their part
-```
+| What | Where |
+|---|---|
+| Results in plain language, key numbers, Q&A answers | [`results/RESULTS.md`](results/RESULTS.md) ← **start here** |
+| Slide-ready figures | [`results/figures/`](results/figures/) |
+| Tables (CSV) | [`results/`](results/) |
+| How the code works / how to run it | [`README.md`](README.md) |
 
-Rule: **nobody looks at test results until Phase 4.** All choices are made on validation.
+## Timeline
 
-## Compute
+| Step | What | Who |
+|---|---|---|
+| 1 | Read `results/RESULTS.md` fully (≈ 20 min) | Everyone |
+| 2 | Review your part using the checklist below; write questions/problems in the group chat | Everyone |
+| 3 | Make your slides in the shared template (Person 6 sends it) | Everyone |
+| 4 | Person 6 merges slides and checks style | Person 6 |
+| 5 | Rehearse twice with a timer, practise the Q&A list | Everyone |
 
-- **Final experiments (A–D × 3 seeds) run on Guy's laptop** (NVIDIA RTX 5070 Laptop, 8 GB).
-  Same hardware for every run keeps the comparison fair and avoids Colab timeouts.
-- **Trying things out:** anyone can use Colab or Kaggle (`notebooks/colab_train.ipynb`) with short runs (e.g. `--epochs 3`)
-  to test their own part. Kaggle gives ~30 GPU hours/week and disconnects less than Colab.
-- Each experiment owner (P2: A, P3: B, P4: C/D) gives Guy the exact command. Guy runs it, puts the run folders
-  (`runs/<name>/`) in the shared Drive `brain_tumor/runs/`, and the owner checks the results.
-- Data on Guy's laptop: `DLMED/data/` (raw, processed); runs in `DLMED/runs/` (both git-ignored).
+Each person presents their own slides (≈ 2 minutes each). Everyone must be able to explain the **big picture**:
+*one shared encoder, two heads (tumor mask + tumor type), compared with single-task models.*
 
 ---
 
-## Person 1 — Data & split
+## Person 1 — Problem & Data
 
-Code: `src/prepare_data.py`, `splits/`
+**Review**
+- [ ] `results/RESULTS.md` sections "Problem" and "Data"
+- [ ] `splits/data_summary.csv` — images and patients per split and class
+- [ ] `src/prepare_data.py` — how `.mat` files become images + masks, and how the split is made
 
-- [ ] Download the 4 zip files from Figshare (link in README) into the shared Drive folder `brain_tumor/raw/`
-- [ ] Run `prepare_data.py` and check the output: 3,064 images, 233 patients, 3 classes, no empty masks
-- [ ] Look at ~10 images per class with the mask overlaid to confirm masks line up with the tumor
-- [ ] Check that no patient is in two splits (the script asserts this; also confirm in `splits/data_summary.csv`)
-- [ ] Commit `splits/splits.csv` and `splits/data_summary.csv`; upload `processed.zip` to Drive
-- [ ] Later: help Person 5 analyse errors by tumor size (`tumor_area` in `metadata.csv`)
+**Slides (3)**
+1. Problem & goal: why segment *and* classify brain tumors; our question "does learning both together help?"
+2. Dataset: Figshare (Cheng et al. 2015), 3,064 MRI slices, 3 tumor types, example images with masks (`figures/0_dataset_examples.png`)
+3. Data split: split **by patient** (70/15/15), the leakage we found and fixed (suffixed patient IDs → 209 patients), split table
 
-**Slides:** problem & objective, dataset source and citation, class distribution table, example images + masks,
-why we split by patient (slices from one patient are near-duplicates → leakage).
+**Be ready to answer:** Why split by patient, not by image? What leakage did we find and how did we fix it?
 
-## Person 2 — Classification (experiment A)
+## Person 2 — Classification
 
-Code: classification head (`model.py`, `aux_params`), `cls_loss` in `losses.py`, `classification_metrics` in `metrics.py`
+**Review**
+- [ ] RESULTS.md "Classification results"
+- [ ] `results/figures/3_confusion_matrices.png`
+- [ ] `src/losses.py` (`cls_loss`), `src/metrics.py` (`classification_metrics`)
 
-- [ ] Understand where the classification head sits (deepest encoder features → pooling → linear)
-- [ ] Run experiment A for seeds 0, 1, 2 with the locked settings, then `evaluate.py` on each
-- [ ] Check class balance (glioma has about 2x the images of meningioma); try class-weighted CE on **validation only** and report if it helps
-- [ ] Optional: Grad-CAM on a few cases to show where the classifier looks (cls-only vs multi-task)
+**Slides (2)**
+1. How classification works: encoder features → pooling → linear layer → 3 classes; cross-entropy loss; metrics Precision / Recall / Macro-F1
+2. Results: experiment A vs C vs D (Macro-F1 table), confusion matrix, which classes get confused and why
 
-**Slides:** classification method, Precision / Recall / Macro-F1, confusion matrix, which classes get confused.
+**Be ready to answer:** Why Macro-F1 and not only accuracy? Which class is hardest and why? Why might segmentation help classification?
 
-## Person 3 — Segmentation (experiment B)
+## Person 3 — Segmentation
 
-Code: U-Net decoder (`model.py`), `seg_loss` / `dice_loss` in `losses.py`, `dice_iou_per_image` in `metrics.py`
+**Review**
+- [ ] RESULTS.md "Segmentation results"
+- [ ] `results/figures/4_dice_by_tumor_type.png`, `5_dice_vs_tumor_size.png`, `7_*_seg_best_worst.png`
+- [ ] `src/losses.py` (`seg_loss`, `dice_loss`), `src/metrics.py` (`dice_iou_per_image`)
 
-- [ ] Understand the U-Net decoder and why the loss is BCE + Dice
-- [ ] Run experiment B for seeds 0, 1, 2, then `evaluate.py` on each
-- [ ] Check `seg_best_worst.png`: green = ground truth, red = prediction
-- [ ] Compare Dice per tumor type (pituitary tumors are often small)
-- [ ] Optional: check whether a threshold other than 0.5 is better on validation
+**Slides (2)**
+1. How segmentation works: U-Net decoder, BCE + Dice loss, Dice / IoU metrics
+2. Results: experiment B vs C vs D (Dice table), best and worst examples vs ground truth, Dice by tumor type and size
 
-**Slides:** segmentation method, Dice / IoU, image comparisons with ground truth, per-tumor-type Dice.
+**Be ready to answer:** What is Dice? Why BCE + Dice? Why are gliomas the hardest to segment? Why didn't multi-task help segmentation?
 
-## Person 4 — Multi-task model & training (experiments C, D)
+## Person 4 — Multi-task Model & Experiments
 
-Code: `model.py`, `train.py`, `MultiTaskLoss` in `losses.py`, `scripts/run_experiments.sh`
+**Review**
+- [ ] RESULTS.md "Method" and "Experiments"
+- [ ] `src/model.py`, `src/train.py`, `MultiTaskLoss` in `src/losses.py`
+- [ ] `results/figures/2_training_curves.png`, `6_uncertainty_weights.png`, `results/tuning_lr_validation.csv`
 
-- [ ] Phase 1: sanity run on Colab (`--epochs 2`) and share the notebook steps that worked with the team
-- [ ] Phase 2: tune lr and epochs on validation using experiment C; write the final settings in the README and tell the team
-- [ ] Run C (equal weights) and D (uncertainty weighting) for seeds 0, 1, 2, then `evaluate.py`
-- [ ] Optional: a few fixed weights (e.g. `--w_cls 0.5`, `--w_cls 2`) chosen on validation
-- [ ] Plot training curves from `history.csv`, and for D the learned weights (`log_var_seg`, `log_var_cls`)
+**Slides (3)**
+1. Architecture diagram (`figures/0_architecture.png`): input → shared ResNet-34 encoder → U-Net decoder (mask) + classification head (type)
+2. Experiments A/B/C/D and why the comparison is fair (same model, data, augmentation, epochs, 3 seeds; lr chosen on validation only)
+3. Training setup table (image size, batch, optimizer, lr, epochs, augmentation) + training curves; how uncertainty weighting works
 
-**Slides:** architecture diagram (shared encoder + 2 heads), loss formulas, training setup table, why the comparison is fair
-(same model, data, augmentation, epochs and seeds; baselines just switch one loss off).
+**Be ready to answer:** What is a shared encoder? What does uncertainty weighting do? How did you choose the learning rate?
 
-## Person 5 — Evaluation & analysis
+## Person 5 — Evaluation & Analysis
 
-Code: `src/evaluate.py`, `src/summarize.py`, `src/engine.py`, analysis notebook
+**Review**
+- [ ] RESULTS.md "Main result", "Error analysis", "Limitations"
+- [ ] `results/figures/1_main_comparison.png`, `results/summary_test.csv`, `results/paired_differences.csv`,
+      `results/errors_by_patient.csv`, `results/error_analysis.json`, `results/figures/7_*_misclassified.png`
 
-- [ ] Build the final table A/B/C/D with `summarize.py` (mean ± std over 3 seeds)
-- [ ] Answer the main question: does multi-task help classification? Does it help segmentation?
-      If the difference is smaller than the std, say so honestly.
-- [ ] Error analysis from `test_predictions.csv`: misclassified cases, lowest-Dice cases, Dice vs tumor size,
-      are misclassified cases also badly segmented?
-- [ ] Write limitations: single dataset/center, 2D slices only, small test set (~35 patients), T1-CE only
+**Slides (3)**
+1. Main result: A/B/C/D comparison (mean ± std over 3 seeds) — does multi-task help each task?
+2. Error analysis: one patient (sellar meningioma) causes most classification errors; misclassified slices are well segmented; worst segmentations are gliomas
+3. Limitations & future work
 
-**Slides:** results table, bar chart with error bars, correct and wrong examples, limitations, conclusion.
+**Be ready to answer:** Is the difference between models real or just noise? What are the main limitations?
 
-## Person 6 — Slides, README & submission
+## Person 6 — Slides, Story & Presentation
 
-Code: `README.md`, `notebooks/`, slides
+**Review**
+- [ ] Whole RESULTS.md and README.md
+- [ ] Open the repo as an outsider: is it clear how to run it? (README "Setup" and "Usage")
 
-- [ ] Make the slide template now (one font, one colour scheme, readable font size, labelled axes)
-- [ ] Draw the pipeline/architecture figures together with Person 4
-- [ ] Collect each person's slides and keep the style consistent; make sure every figure has a title and axis labels
-- [ ] Final check: clone the repo fresh on Colab and run it from the README alone
-- [ ] Organise rehearsals, time the talk, and prepare a list of likely questions and answers
+**Slides (3) + whole deck**
+1. Title (project name, team names, course)
+2. Outline
+3. Conclusion: answer to our question in one sentence + 3 key takeaways
+- Make the template **before** step 3: one font, one colour set (use the experiment colours from the figures: A blue, B orange, C green, D yellow), big text (≥ 18 pt), every chart with title and axis labels
+- Merge everyone's slides, keep style consistent, add slide numbers, time the rehearsal
 
-**Slides:** title, outline, conclusion; owns the whole deck's look.
+**Be ready to answer:** Summarise the whole project in 30 seconds.
 
 ---
 
-## Likely questions (everyone should be able to answer)
+## Slide order (≈ 16 slides, ≈ 12–15 minutes)
 
-- Why split by patient and not by image?
-- What is a shared encoder, and why could two tasks help each other?
-- Why Dice for segmentation and Macro-F1 for classification (not just accuracy)?
-- How do you know the comparison between A/B/C/D is fair?
-- What does uncertainty weighting do?
-- Why didn't multi-task help much / help a lot? What are the limitations?
+| # | Slide | Person | Rubric item |
+|---|---|---|---|
+| 1 | Title | 6 | – |
+| 2 | Outline | 6 | – |
+| 3 | Problem & goal | 1 | Problem & data (2) |
+| 4 | Dataset | 1 | Problem & data |
+| 5 | Patient-level split & leakage fix | 1 | Problem & data |
+| 6 | Architecture (shared encoder + 2 heads) | 4 | Difficulty (4): multi-task |
+| 7 | Experiments A–D & fair comparison | 4 | Model & experiments (2) |
+| 8 | Training setup & curves | 4 | Model & experiments |
+| 9 | Classification method | 2 | Model & experiments |
+| 10 | Segmentation method | 3 | Model & experiments |
+| 11 | Main result A/B/C/D | 5 | Evaluation (2) |
+| 12 | Classification results + confusion matrix | 2 | Evaluation |
+| 13 | Segmentation results + examples vs ground truth | 3 | Evaluation |
+| 14 | Error analysis | 5 | Evaluation |
+| 15 | Limitations & future work | 5 | Evaluation |
+| 16 | Conclusion | 6 | – |
+
+The other two rubric items are **slide design (2)** (Person 6 keeps it clean and consistent) and
+**presentation & Q&A (3)** (everyone presents their part and answers questions).

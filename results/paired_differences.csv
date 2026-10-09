@@ -1,0 +1,5 @@
+comparison,metric,per_seed,mean_diff,seeds_better,n_seeds
+C_mtl_equal - A_cls,macro_f1,"[0.012, 0.0178, 0.0361]",0.022,3,3
+C_mtl_equal - B_seg,dice,"[-0.0126, 0.0083, 0.0065]",0.0007,2,3
+D_mtl_uncert - A_cls,macro_f1,"[0.0097, 0.006, 0.0065]",0.0074,3,3
+D_mtl_uncert - B_seg,dice,"[-0.0151, 0.0079, -0.0094]",-0.0056,1,3

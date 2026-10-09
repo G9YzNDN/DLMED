@@ -1,50 +1,43 @@
 # Guy × Claude — progress & todo
 
-Project: Brain Tumor Segmentation + Tumor-Type Classification (Multi-task Learning, aims at the 4-point difficulty level).
-Team plan: [TASKS.md](TASKS.md) · How to run: [README.md](README.md)
+Project: Brain Tumor Segmentation + Tumor-Type Classification (Multi-task Learning, 4-point difficulty level).
+Team plan: [TASKS.md](TASKS.md) · Results: [results/RESULTS.md](results/RESULTS.md) · How to run: [README.md](README.md)
+
+## Status: project finished (2026-10-09) — team review and slides next
+
+**Headline:** multi-task learning improved classification (Macro-F1 0.916 → 0.938, better in 3/3 seeds) and kept
+segmentation equal (Dice 0.774 vs 0.775). Equal loss weights beat learned (uncertainty) weights.
 
 ## Done
 
-- [x] **2026-10-09** Reviewed the friend's proposal against the rubric → topic accepted (MTL = 4 pts if both tasks are trained jointly and reported separately)
-- [x] **2026-10-09** Created GitHub repo `G9YzNDN/DLMED` (public) and pushed the project scaffold
-  - data prep (.mat → PNG, patient-level split), shared-encoder model, training with `--tasks cls/seg/both`,
-    loss weighting (fixed / uncertainty), test evaluation + figures, summary table, Colab notebook
-- [x] **2026-10-09** Smoke-tested the whole pipeline (prepare → train A–D → evaluate → summarize) on fake `.mat` data on CPU
-- [x] **2026-10-09** Wrote team roles for 6 people in TASKS.md
-- [x] **2026-10-09** Decided final experiments run on my laptop (RTX 5070 Laptop, 8 GB); Colab/Kaggle only for trying things out
-- [x] **2026-10-09** Local GPU environment set up at `C:\Users\guymy\.venvs\dlmed` (PyTorch 2.11 + CUDA 12.8); GPU check passed
-  - Benchmark: ~90 ms/step (batch 16, 256×256), ~1.4 GB GPU memory → about 12 s/epoch of training on the real data,
-    so roughly 10 min per 30-epoch run and ~2 h for all 12 final runs (estimate; first real run will confirm)
-  - Fixed slow epochs on Windows (DataLoader workers now persistent)
-- [x] **2026-10-09** Downloaded the Figshare dataset (4 zips, ~880 MB, checksums verified) into `DLMED/data/raw/` (git-ignored)
-- [x] **2026-10-09** Ran `prepare_data.py` on the real data: 3,064 images, 233 patient IDs; masks checked visually (`data/sample_overlays.png`)
-- [x] **2026-10-09** Found patient leakage: 18 glioma IDs with letter suffixes (MR040240, MR040240B, ...) = same person,
-  14 of them were spread across splits → merged them (209 patients) and re-split; committed `splits/splits.csv`
-  - train 151 / val 29 / test 29 patients (2,194 / 434 / 436 images), no patient in two splits
+- [x] **2026-10-09** Reviewed the friend's proposal against the rubric → topic accepted
+- [x] **2026-10-09** Created GitHub repo `G9YzNDN/DLMED` (public) and the project code
+  (data prep, shared-encoder model, training `--tasks cls/seg/both`, fixed/uncertainty loss weighting, evaluation, Colab notebook)
+- [x] **2026-10-09** Smoke-tested the pipeline on fake data; set up the local GPU environment (RTX 5070 Laptop, PyTorch 2.11 + CUDA 12.8)
+- [x] **2026-10-09** Downloaded the Figshare dataset (checksums verified) → `DLMED/data/` (git-ignored); 3,064 images, masks checked visually
+- [x] **2026-10-09** Found and fixed patient leakage (suffixed glioma IDs = same person) → 209 patients, split 151 / 29 / 29
+- [x] **2026-10-09** Learning rate chosen on validation only (1e-4 / **3e-4** / 1e-3) → `results/tuning_lr_validation.csv`
+- [x] **2026-10-09** Final experiments A–D × 3 seeds (12 runs, ≈ 7 min each) + test evaluation
+- [x] **2026-10-09** Analysis: summary table, per-seed comparison, per-class / per-type / per-size results,
+  error analysis by patient (one sellar meningioma patient = most classification errors), learned weights
+- [x] **2026-10-09** 10 slide-ready figures in `results/figures/` (architecture, dataset, main result, curves, confusion matrices, Dice by type/size, weights, examples)
+- [x] **2026-10-09** Wrote `results/RESULTS.md` (findings, limitations, Q&A answers) and rewrote `TASKS.md` as a review + slides plan
 
-## Todo
+## Todo (me)
 
-### Now
-- [ ] Invite the 5 teammates as collaborators (repo → Settings → Collaborators)
-- [ ] Send the repo link + TASKS.md to the team; confirm who is Person 1–6 (my role: ______)
-- [ ] Create the shared Google Drive folder `brain_tumor/` (`raw/`, `runs/`) and share it
+- [ ] Invite the 5 teammates as collaborators (repo → Settings → Collaborators) — only needed if they will push
+- [ ] Send the team the repo link and say: read `results/RESULTS.md`, then follow `TASKS.md`
+- [ ] Confirm who is Person 1–6 (my role: ______)
+- [ ] Optional: share `data/raw/zips/` on Google Drive if a teammate wants to re-run on Colab
 
-### Data (with Person 1)
-- [ ] Tell Person 1 the data + split are done; they own the data slides (class table, split, leakage finding)
-- [ ] Upload the 4 zips to Drive `brain_tumor/raw/` and/or `processed.zip` for teammates on Colab/Kaggle
+## Todo (team — see TASKS.md)
 
-### Training on my laptop
-- [ ] First real sanity run: `--tasks both --epochs 2`, check speed per epoch and GPU memory
-- [ ] Person 4 locks settings (lr, epochs) on validation
-- [ ] Run final experiments A–D × seeds 0, 1, 2 (`scripts/run_experiments.sh`)
-- [ ] Copy `runs/` to Drive for Person 5
-
-### Wrap-up
-- [ ] Results table + error analysis (Person 5)
-- [ ] Slides, README final check, rehearsal (Person 6)
+- [ ] Everyone reads RESULTS.md and reviews their part
+- [ ] Person 6 sends the slide template; everyone makes their slides
+- [ ] Merge slides, rehearse twice with a timer, practise the Q&A list
 
 ## Notes
 
-- Python env: `C:/Users/guymy/.venvs/dlmed/Scripts/python` (outside OneDrive on purpose)
-- Data / runs: `DLMED/data/` and `DLMED/runs/` (git-ignored; inside OneDrive, so they sync to the cloud)
-- Do not look at test results before settings are locked on validation.
+- Python env: `C:/Users/guymy/.venvs/dlmed/Scripts/python`
+- Data: `DLMED/data/` · trained runs + checkpoints: `DLMED/runs/` (both git-ignored, stay on this laptop)
+- Rebuild results after any change: `python src/analyze.py --runs_dir runs --out_dir results`

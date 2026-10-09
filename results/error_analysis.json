@@ -1,0 +1,26 @@
+{
+  "C_mtl_equal": {
+    "n_predictions": 1308,
+    "misclassified": 63,
+    "dice_when_class_correct": 0.7675390745847389,
+    "dice_when_class_wrong": 0.9214396826984126,
+    "median_area_correct": 3633.0,
+    "median_area_wrong": 3034.0,
+    "share_dice_below_0.5": 0.10856269113149847,
+    "share_dice_zero": 0.0389908256880734
+  },
+  "D_mtl_uncert": {
+    "n_predictions": 1308,
+    "misclassified": 78,
+    "dice_when_class_correct": 0.7617477451601625,
+    "dice_when_class_wrong": 0.877517127051282,
+    "median_area_correct": 3652.0,
+    "median_area_wrong": 3037.0,
+    "share_dice_below_0.5": 0.1154434250764526,
+    "share_dice_zero": 0.03746177370030581
+  },
+  "B_seg": {
+    "share_dice_below_0.5": 0.11926605504587157,
+    "share_dice_zero": 0.0382262996941896
+  }
+}

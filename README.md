@@ -7,6 +7,8 @@ One model with a **shared encoder** learns two tasks together from a T1-weighted
 
 Main question: *does learning where the tumor is help classify its type (and vice versa)?*
 
+**Results: see [results/RESULTS.md](results/RESULTS.md).**
+
 ## Dataset
 
 **Figshare Brain Tumor Dataset** (Jun Cheng): 3,064 slices from 233 patients, `.mat` (MATLAB v7.3) files containing
@@ -33,15 +35,13 @@ C:/Users/<you>/.venvs/dlmed/Scripts/python -c "import torch; print(torch.cuda.is
 ```
 
 - RTX 50-series GPUs need the CUDA 12.8 build (`cu128`) as above; older GPUs also work with it.
-- If the project folder is inside OneDrive/Dropbox, keep the venv, data and runs **outside** it
-  (e.g. `--data_dir C:/brain_tumor/processed --out_dir C:/brain_tumor/runs`) so gigabytes are not synced.
 - If DataLoader workers cause errors on Windows, add `--workers 0`.
 
 ## Usage
 
 ```bash
-# 1. Convert .mat -> PNG and make the patient-level split (writes splits/splits.csv)
-python src/prepare_data.py --raw_dir data/raw --out_dir data/processed
+# 1. Convert .mat -> PNG (splits/splits.csv is already committed and is kept as is)
+python src/prepare_data.py --raw_dir data/raw/mat --out_dir data/processed
 
 # 2. Train one experiment (best epoch picked on validation)
 python src/train.py --tasks both --name C_mtl_equal_seed0
@@ -49,9 +49,12 @@ python src/train.py --tasks both --name C_mtl_equal_seed0
 # 3. Evaluate on the held-out test set
 python src/evaluate.py --run runs/C_mtl_equal_seed0
 
-# 4. Run all experiments x 3 seeds and build the comparison table
+# 4. Learning-rate tuning on validation, then all experiments x 3 seeds
+bash scripts/tune_lr.sh
 bash scripts/run_experiments.sh
-python src/summarize.py --runs_dir runs --split test
+
+# 5. Final tables + slide figures -> results/
+python src/analyze.py --runs_dir runs --out_dir results
 ```
 
 Colab: open `notebooks/colab_train.ipynb`.
@@ -82,7 +85,7 @@ deepest encoder features), the same data, augmentation, epochs and seeds. Single
 
 Fixed weights can also be tried, e.g. `--tasks both --w_seg 1 --w_cls 0.5`.
 
-Default settings: image 256x256, batch 16, AdamW lr 3e-4, weight decay 1e-4, cosine schedule, 30 epochs, mixed precision on GPU.
+Settings (lr chosen on validation from 1e-4 / 3e-4 / 1e-3, see `results/tuning_lr_validation.csv`): image 256x256, batch 16, AdamW lr 3e-4, weight decay 1e-4, cosine schedule, 30 epochs, mixed precision on GPU.
 Segmentation loss = BCE + Dice; classification loss = cross-entropy.
 Augmentation (train only, applied to image and mask together): horizontal flip, affine (scale ±10 %, shift ±5 %, rotate ±15°), brightness/contrast.
 
@@ -109,24 +112,14 @@ src/engine.py         inference loop shared by training and evaluation
 src/train.py          training (one experiment)
 src/evaluate.py       test-set evaluation and figures
 src/summarize.py      comparison table across runs and seeds
-scripts/run_experiments.sh
+src/analyze.py        final tables + slide figures -> results/
+scripts/tune_lr.sh    learning-rate choice on validation
+scripts/run_experiments.sh   A-D x 3 seeds, train + test evaluation
 notebooks/colab_train.ipynb
 splits/               shared split files (committed)
+results/              final results: RESULTS.md, tables, figures (committed)
 ```
 
 ## Team
 
-| Person | Role | Main files |
-|---|---|---|
-| 1 | Data & split | `prepare_data.py`, `splits/` |
-| 2 | Classification head, cls loss/metrics, experiment A | `losses.py`, `metrics.py` |
-| 3 | Segmentation decoder, seg loss/metrics, experiment B | `losses.py`, `metrics.py` |
-| 4 | Multi-task model & training, experiments C/D | `model.py`, `train.py` |
-| 5 | Evaluation & analysis | `evaluate.py`, `summarize.py`, analysis notebook |
-| 6 | Slides, README, submission | `README.md`, slides |
-
-## Workflow
-
-1. `git pull` before you start.
-2. Work on your own branch (`git checkout -b <topic>`) and open a Pull Request into `main`.
-3. Never commit data, checkpoints or run outputs (see `.gitignore`).
+Who reviews what, slide order and Q&A preparation: see [TASKS.md](TASKS.md).

@@ -69,6 +69,11 @@ def plot_examples(model, ds, ids, titles, path, device, show_mask=True, ncols=4)
                 ax.contour(pred, levels=[0.5], colors="red", linewidths=1)
         ax.set_title(title, fontsize=8)
         ax.axis("off")
+    if show_mask:
+        from matplotlib.lines import Line2D
+        fig.legend(handles=[Line2D([], [], color="lime", label="expert mask (ground truth)"),
+                            Line2D([], [], color="red", label="model prediction")],
+                   loc="lower center", bbox_to_anchor=(0.5, 1.0), ncols=2, frameon=False, fontsize=10)
     fig.tight_layout()
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)

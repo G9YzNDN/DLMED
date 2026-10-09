@@ -76,8 +76,9 @@ def main():
     train_ds = BrainTumorDataset(args.data_dir, args.splits, "train", args.size, train=True)
     val_ds = BrainTumorDataset(args.data_dir, args.splits, "val", args.size)
     train_dl = DataLoader(train_ds, args.batch_size, shuffle=True, num_workers=args.workers,
-                          pin_memory=True, drop_last=True)
-    val_dl = DataLoader(val_ds, args.batch_size, num_workers=args.workers, pin_memory=True)
+                          pin_memory=True, drop_last=True, persistent_workers=args.workers > 0)
+    val_dl = DataLoader(val_ds, args.batch_size, num_workers=args.workers, pin_memory=True,
+                        persistent_workers=args.workers > 0)
     print(f"train {len(train_ds)}  val {len(val_ds)} images")
 
     model = build_model(args.encoder, pretrained=not args.no_pretrained).to(device)

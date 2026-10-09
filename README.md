@@ -21,9 +21,21 @@ On Colab, keep data and runs in a shared Google Drive folder.
 
 ## Setup
 
+**Colab / Kaggle:** use `notebooks/colab_train.ipynb` (installs what it needs).
+
+**Local machine with an NVIDIA GPU (Windows):**
+
 ```bash
-pip install -r requirements.txt
+python -m venv C:/Users/<you>/.venvs/dlmed
+C:/Users/<you>/.venvs/dlmed/Scripts/python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+C:/Users/<you>/.venvs/dlmed/Scripts/python -m pip install -r requirements.txt
+C:/Users/<you>/.venvs/dlmed/Scripts/python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
 ```
+
+- RTX 50-series GPUs need the CUDA 12.8 build (`cu128`) as above; older GPUs also work with it.
+- If the project folder is inside OneDrive/Dropbox, keep the venv, data and runs **outside** it
+  (e.g. `--data_dir C:/brain_tumor/processed --out_dir C:/brain_tumor/runs`) so gigabytes are not synced.
+- If DataLoader workers cause errors on Windows, add `--workers 0`.
 
 ## Usage
 

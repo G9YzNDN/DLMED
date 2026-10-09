@@ -11,11 +11,22 @@ Phase 1  Data ready        Person 1 makes splits.csv + processed.zip   (everyone
          Sanity check      Person 4 trains 2-3 epochs to prove the pipeline works on Colab
 Phase 2  Freeze settings   Person 4 tunes lr / epochs on VALIDATION with experiment C, then settings are locked
 Phase 3  Run experiments   A (P2), B (P3), C + D (P4), each x 3 seeds, all with the locked settings
+                           Final runs are executed on Guy's laptop (see "Compute" below)
 Phase 4  Evaluate          Person 5 builds the comparison table and error analysis
 Phase 5  Slides + rehearse Person 6 assembles, everyone presents their part
 ```
 
 Rule: **nobody looks at test results until Phase 4.** All choices are made on validation.
+
+## Compute
+
+- **Final experiments (A–D × 3 seeds) run on Guy's laptop** (NVIDIA RTX 5070 Laptop, 8 GB).
+  Same hardware for every run keeps the comparison fair and avoids Colab timeouts.
+- **Trying things out:** anyone can use Colab or Kaggle (`notebooks/colab_train.ipynb`) with short runs (e.g. `--epochs 3`)
+  to test their own part. Kaggle gives ~30 GPU hours/week and disconnects less than Colab.
+- Each experiment owner (P2: A, P3: B, P4: C/D) gives Guy the exact command. Guy runs it, puts the run folders
+  (`runs/<name>/`) in the shared Drive `brain_tumor/runs/`, and the owner checks the results.
+- Data on Guy's laptop lives outside OneDrive in `C:/brain_tumor/` (raw, processed, runs).
 
 ---
 

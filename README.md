@@ -61,6 +61,11 @@ Colab: open `notebooks/colab_train.ipynb`.
 Slices from the same patient are near-duplicates, so the split is done **by patient**
 (`StratifiedGroupKFold`, grouped by `PID`, stratified by tumor type): about 70 / 15 / 15 % train / val / test.
 `prepare_data.py` asserts that no patient appears in two splits.
+
+The dataset lists 233 patient IDs, but 18 glioma IDs appear with letter suffixes
+(e.g. `MR040240`, `MR040240B`, `MR040240C`, `MR040240D`), which look like repeat scans of the same person.
+With raw IDs, 14 of these groups ended up spread over train/val/test. We therefore merge suffixed IDs
+(`patient` column) and split on that: **209 patients → train 151 / val 29 / test 29 (2,194 / 434 / 436 images)**.
 **Everyone uses the committed `splits/splits.csv`.** The test set is only used after all settings are chosen on validation.
 
 ## Experiments

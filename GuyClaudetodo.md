@@ -16,6 +16,11 @@ Team plan: [TASKS.md](TASKS.md) · How to run: [README.md](README.md)
   - Benchmark: ~90 ms/step (batch 16, 256×256), ~1.4 GB GPU memory → about 12 s/epoch of training on the real data,
     so roughly 10 min per 30-epoch run and ~2 h for all 12 final runs (estimate; first real run will confirm)
   - Fixed slow epochs on Windows (DataLoader workers now persistent)
+- [x] **2026-10-09** Downloaded the Figshare dataset (4 zips, ~880 MB, checksums verified) into `DLMED/data/raw/` (git-ignored)
+- [x] **2026-10-09** Ran `prepare_data.py` on the real data: 3,064 images, 233 patient IDs; masks checked visually (`data/sample_overlays.png`)
+- [x] **2026-10-09** Found patient leakage: 18 glioma IDs with letter suffixes (MR040240, MR040240B, ...) = same person,
+  14 of them were spread across splits → merged them (209 patients) and re-split; committed `splits/splits.csv`
+  - train 151 / val 29 / test 29 patients (2,194 / 434 / 436 images), no patient in two splits
 
 ## Todo
 
@@ -25,14 +30,13 @@ Team plan: [TASKS.md](TASKS.md) · How to run: [README.md](README.md)
 - [ ] Create the shared Google Drive folder `brain_tumor/` (`raw/`, `runs/`) and share it
 
 ### Data (with Person 1)
-- [ ] Download the 4 Figshare zip files → `C:/brain_tumor/raw/` (and Drive `brain_tumor/raw/`)
-- [ ] Run `prepare_data.py` on the real data, check 3,064 images / 233 patients, commit `splits/splits.csv`
-- [ ] Upload `processed.zip` to Drive for teammates on Colab/Kaggle
+- [ ] Tell Person 1 the data + split are done; they own the data slides (class table, split, leakage finding)
+- [ ] Upload the 4 zips to Drive `brain_tumor/raw/` and/or `processed.zip` for teammates on Colab/Kaggle
 
 ### Training on my laptop
 - [ ] First real sanity run: `--tasks both --epochs 2`, check speed per epoch and GPU memory
 - [ ] Person 4 locks settings (lr, epochs) on validation
-- [ ] Run final experiments A–D × seeds 0, 1, 2 (`scripts/run_experiments.sh` with the `C:/brain_tumor` paths)
+- [ ] Run final experiments A–D × seeds 0, 1, 2 (`scripts/run_experiments.sh`)
 - [ ] Copy `runs/` to Drive for Person 5
 
 ### Wrap-up
@@ -42,5 +46,5 @@ Team plan: [TASKS.md](TASKS.md) · How to run: [README.md](README.md)
 ## Notes
 
 - Python env: `C:/Users/guymy/.venvs/dlmed/Scripts/python` (outside OneDrive on purpose)
-- Data / runs: `C:/brain_tumor/` (outside OneDrive so GBs are not synced)
+- Data / runs: `DLMED/data/` and `DLMED/runs/` (git-ignored; inside OneDrive, so they sync to the cloud)
 - Do not look at test results before settings are locked on validation.

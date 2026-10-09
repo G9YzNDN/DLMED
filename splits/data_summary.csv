@@ -1,0 +1,4 @@
+split,images,patients,meningioma_images,meningioma_patients,glioma_images,glioma_patients,pituitary_images,pituitary_patients
+train,2194,151,505,59,1019,48,670,44
+val,434,29,102,12,203,8,129,9
+test,436,29,101,11,204,9,131,9

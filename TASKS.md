@@ -26,7 +26,7 @@ Rule: **nobody looks at test results until Phase 4.** All choices are made on va
   to test their own part. Kaggle gives ~30 GPU hours/week and disconnects less than Colab.
 - Each experiment owner (P2: A, P3: B, P4: C/D) gives Guy the exact command. Guy runs it, puts the run folders
   (`runs/<name>/`) in the shared Drive `brain_tumor/runs/`, and the owner checks the results.
-- Data on Guy's laptop lives outside OneDrive in `C:/brain_tumor/` (raw, processed, runs).
+- Data on Guy's laptop: `DLMED/data/` (raw, processed); runs in `DLMED/runs/` (both git-ignored).
 
 ---
 

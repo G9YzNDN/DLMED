@@ -6,11 +6,12 @@ Usage:
 Outputs:
     <out_dir>/images/<id>.png   grayscale image, min-max scaled to uint8, original size
     <out_dir>/masks/<id>.png    tumor mask, 0/255
-    <out_dir>/metadata.csv      id, label, class_name, pid, height, width, tumor_area
-    splits/splits.csv           id, label, pid, split   (commit this file; everyone uses it)
+    <out_dir>/metadata.csv      id, label, class_name, pid, patient, height, width, tumor_area
+    splits/splits.csv           id, label, pid, patient, split   (commit this file; everyone uses it)
     splits/data_summary.csv     images / patients per split and class
 """
 import argparse
+import re
 from pathlib import Path
 
 import cv2
@@ -33,6 +34,13 @@ def read_mat(path):
     return image, mask, label, pid
 
 
+def patient_group(pid):
+    """Some glioma IDs come with letter suffixes (MR040240, MR040240B, MR040240C ...).
+    These look like repeat scans of the same person, so they are treated as one patient
+    to keep all of that person's slices in the same split."""
+    return re.sub(r"^(MR\d+)[A-Z]$", r"\1", pid)
+
+
 def to_uint8(image):
     lo, hi = image.min(), image.max()
     return ((image - lo) / max(hi - lo, 1e-8) * 255).astype(np.uint8)
@@ -41,7 +49,7 @@ def to_uint8(image):
 def split_by_patient(meta, test_frac, val_frac, seed):
     """Stratified (by tumor type) and grouped (by patient) train/val/test split."""
     meta = meta.copy()
-    y, groups = meta["label"].values, meta["pid"].values
+    y, groups = meta["label"].values, meta["patient"].values
 
     sgkf = StratifiedGroupKFold(n_splits=round(1 / test_frac), shuffle=True, random_state=seed)
     trainval_idx, test_idx = next(sgkf.split(meta, y, groups))
@@ -51,11 +59,11 @@ def split_by_patient(meta, test_frac, val_frac, seed):
     tv = meta.iloc[trainval_idx]
     n_val_splits = round((1 - test_frac) / val_frac)
     sgkf = StratifiedGroupKFold(n_splits=n_val_splits, shuffle=True, random_state=seed)
-    _, val_idx = next(sgkf.split(tv, tv["label"].values, tv["pid"].values))
+    _, val_idx = next(sgkf.split(tv, tv["label"].values, tv["patient"].values))
     meta.loc[tv.index[val_idx], "split"] = "val"
 
     # No patient may appear in more than one split
-    pids = {s: set(meta.loc[meta.split == s, "pid"]) for s in ("train", "val", "test")}
+    pids = {s: set(meta.loc[meta.split == s, "patient"]) for s in ("train", "val", "test")}
     assert not (pids["train"] & pids["val"]), "patient leak train/val"
     assert not (pids["train"] & pids["test"]), "patient leak train/test"
     assert not (pids["val"] & pids["test"]), "patient leak val/test"
@@ -66,10 +74,10 @@ def summarize(meta):
     rows = []
     for split in ("train", "val", "test"):
         s = meta[meta.split == split]
-        row = {"split": split, "images": len(s), "patients": s.pid.nunique()}
+        row = {"split": split, "images": len(s), "patients": s.patient.nunique()}
         for k, name in CLASS_NAMES.items():
             row[f"{name}_images"] = int((s.label == k).sum())
-            row[f"{name}_patients"] = s[s.label == k].pid.nunique()
+            row[f"{name}_patients"] = s[s.label == k].patient.nunique()
         rows.append(row)
     return pd.DataFrame(rows)
 
@@ -110,8 +118,10 @@ def main():
             print(f"  {i}/{len(files)}")
 
     meta = pd.DataFrame(rows)
+    meta.insert(4, "patient", meta.pid.map(patient_group))
     meta.to_csv(out / "metadata.csv", index=False)
-    print(f"Converted {len(meta)} images from {meta.pid.nunique()} patients")
+    print(f"Converted {len(meta)} images from {meta.pid.nunique()} patient IDs "
+          f"-> {meta.patient.nunique()} patients after merging suffixed IDs")
     if (meta.tumor_area == 0).any():
         print(f"WARNING: {(meta.tumor_area == 0).sum()} images have an empty mask")
 
@@ -120,7 +130,7 @@ def main():
         print(f"Keeping existing {split_csv} (the shared split). Use --overwrite_split to remake it.")
         return
     meta = split_by_patient(meta, args.test_frac, args.val_frac, args.seed)
-    meta[["id", "label", "pid", "split"]].to_csv(split_csv, index=False)
+    meta[["id", "label", "pid", "patient", "split"]].to_csv(split_csv, index=False)
     summary = summarize(meta)
     summary.to_csv(split_dir / "data_summary.csv", index=False)
     print(summary.to_string(index=False))

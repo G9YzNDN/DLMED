@@ -27,13 +27,13 @@ segmentation equal (Dice 0.774 vs 0.775). Equal loss weights beat learned (uncer
 
 - [ ] Invite the 5 teammates as collaborators (repo → Settings → Collaborators) — only needed if they will push
 - [ ] Send the team the repo link and say: read `results/RESULTS.md`, then follow `TASKS.md`
-- [ ] Confirm who is Person 1–6 (my role: ______)
+- [ ] Send the Thai topic message; each person picks 1 of the 6 topics and writes their name in TASKS.md (my topic: ______)
 - [ ] Optional: share `data/raw/zips/` on Google Drive if a teammate wants to re-run on Colab
 
 ## Todo (team — see TASKS.md)
 
 - [ ] Everyone reads RESULTS.md and reviews their part
-- [ ] Person 6 sends the slide template; everyone makes their slides
+- [ ] Meet as a group and make the slides together (slide order in TASKS.md)
 - [ ] Merge slides, rehearse twice with a timer, practise the Q&A list
 
 ## Notes

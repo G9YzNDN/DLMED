@@ -1,137 +1,160 @@
-# Team Plan — Review, Slides, Presentation
+# แผนงานทีม — ศึกษา · ทำสไลด์ร่วมกัน · นำเสนอ
 
-**Status: the project is finished.** Headline: multi-task learning improved classification (Macro-F1 0.916 → 0.938) and kept segmentation equal (Dice ≈ 0.775). Data, code, all experiments, test results and figures are in this repo.
-Our job now: **(1) understand and check** our part, **(2) make our slides**, **(3) present and answer questions.**
+**สถานะ: โปรเจกต์ทำเสร็จแล้ว** ทั้งข้อมูล โค้ด การทดลองทั้งหมด ผลบน test set และรูปสำหรับสไลด์ อยู่ใน repo นี้
 
-You do **not** need to run any code. Everything you need is on GitHub:
+**ผลหลัก:** การเรียนรู้ 2 งานร่วมกัน (multi-task) ช่วยให้จำแนกชนิดเนื้องอกดีขึ้น (Macro-F1 0.916 → 0.938)
+และการแบ่งบริเวณเนื้องอกยังดีเท่าเดิม (Dice ≈ 0.775)
 
-| What | Where |
+**ไม่ต้องรันโค้ด** ทุกอย่างอยู่บน GitHub แล้ว:
+
+| อะไร | อยู่ที่ไหน |
 |---|---|
-| Results in plain language, key numbers, Q&A answers | [`results/RESULTS.md`](results/RESULTS.md) ← **start here** |
-| Slide-ready figures | [`results/figures/`](results/figures/) |
-| Tables (CSV) | [`results/`](results/) |
-| How the code works / how to run it | [`README.md`](README.md) |
+| สรุปผลแบบอ่านง่าย ตัวเลขสำคัญ คำตอบสำหรับ Q&A | [`results/RESULTS.md`](results/RESULTS.md) ← **อ่านอันนี้ก่อน** |
+| รูปพร้อมใช้ในสไลด์ | [`results/figures/`](results/figures/) |
+| ตารางผล (CSV) | [`results/`](results/) |
+| โค้ดทำงานอย่างไร / วิธีรัน | [`README.md`](README.md) |
 
-## Timeline
+## ขั้นตอน
 
-| Step | What | Who |
+| ขั้น | ทำอะไร | ใคร |
 |---|---|---|
-| 1 | Read `results/RESULTS.md` fully (≈ 20 min) | Everyone |
-| 2 | Review your part using the checklist below; write questions/problems in the group chat | Everyone |
-| 3 | Make your slides in the shared template (Person 6 sends it) | Everyone |
-| 4 | Person 6 merges slides and checks style | Person 6 |
-| 5 | Rehearse twice with a timer, practise the Q&A list | Everyone |
+| 1 | เลือกหัวข้อ (หัวข้อละ 1 คน) แล้วใส่ชื่อในตารางด้านล่าง | ทุกคน |
+| 2 | อ่าน `results/RESULTS.md` ทั้งหมด (~20 นาที) | ทุกคน |
+| 3 | ศึกษาหัวข้อของตัวเองตาม checklist มีคำถามให้ถามในกลุ่ม | ทุกคน |
+| 4 | **นัดทำสไลด์ด้วยกันทั้งกลุ่ม** ตามลำดับสไลด์ด้านล่าง ใช้รูปจาก `results/figures/` | ทุกคน |
+| 5 | ซ้อมนำเสนอ 2 รอบ จับเวลา และฝึกตอบคำถาม | ทุกคน |
 
-Each person presents their own slides (≈ 2 minutes each). Everyone must be able to explain the **big picture**:
-*one shared encoder, two heads (tumor mask + tumor type), compared with single-task models.*
+ตอนนำเสนอ แต่ละคนพูดหัวข้อของตัวเอง (~2 นาที) และ **ทุกคนต้องอธิบายภาพรวมได้**
+(คะแนนนำเสนอและตอบคำถามมี 3 คะแนน):
+*โมเดลเดียว มี shared encoder หนึ่งตัว และ 2 heads (mask เนื้องอก + ชนิดเนื้องอก) เทียบกับโมเดลที่เรียนงานเดียว*
+
+## ใครเลือกหัวข้อไหน
+
+| หัวข้อ | ชื่อ |
+|---|---|
+| 1) ปัญหาและข้อมูล | |
+| 2) การจำแนกชนิดเนื้องอก (Classification) | |
+| 3) การแบ่งบริเวณเนื้องอก (Segmentation) | |
+| 4) โมเดล Multi-task และการทดลอง | |
+| 5) การประเมินและวิเคราะห์ผล | |
+| 6) ภาพรวม ข้อจำกัด และบทสรุป | |
 
 ---
 
-## Person 1 — Problem & Data
+## 1) ปัญหาและข้อมูล
 
-**Review**
-- [ ] `results/RESULTS.md` sections "Problem" and "Data"
-- [ ] `splits/data_summary.csv` — images and patients per split and class
-- [ ] `src/prepare_data.py` — how `.mat` files become images + masks, and how the split is made
+**ศึกษา**
+- [ ] RESULTS.md หัวข้อ 1 "Problem" และ 2 "Data"
+- [ ] `splits/data_summary.csv` — จำนวนภาพและผู้ป่วยในแต่ละชุดและแต่ละคลาส
+- [ ] `src/prepare_data.py` — แปลงไฟล์ `.mat` เป็นภาพ + mask และแบ่งข้อมูลอย่างไร
 
-**Slides (3)**
-1. Problem & goal: why segment *and* classify brain tumors; our question "does learning both together help?"
-2. Dataset: Figshare (Cheng et al. 2015), 3,064 MRI slices, 3 tumor types, example images with masks (`figures/0_dataset_examples.png`)
-3. Data split: split **by patient** (70/15/15), the leakage we found and fixed (suffixed patient IDs → 209 patients), split table
+**นำเสนอเรื่อง**
+- ที่มาของปัญหา: ทำไมต้องทั้งหาตำแหน่งและบอกชนิดเนื้องอก, คำถามวิจัย "เรียนรู้ร่วมกันช่วยไหม?"
+- Dataset: Figshare (Cheng et al. 2015), 3,064 ภาพ MRI, 3 ชนิดเนื้องอก (รูป `0_dataset_examples.png`)
+- แบ่งข้อมูล **ตามผู้ป่วย** (~70/15/15) และ data leakage ที่เจอแล้วแก้ (patient ID ที่มีตัวอักษรต่อท้าย → รวมเหลือ 209 คน)
 
-**Be ready to answer:** Why split by patient, not by image? What leakage did we find and how did we fix it?
+**เตรียมตอบ:** ทำไมแบ่งตามผู้ป่วยไม่ใช่ตามภาพ? leakage ที่เจอคืออะไร แก้อย่างไร?
 
-## Person 2 — Classification
+## 2) การจำแนกชนิดเนื้องอก (Classification)
 
-**Review**
-- [ ] RESULTS.md "Classification results"
-- [ ] `results/figures/3_confusion_matrices.png`
+**ศึกษา**
+- [ ] RESULTS.md หัวข้อ 6 "Classification results"
+- [ ] รูป `3_confusion_matrices.png`
 - [ ] `src/losses.py` (`cls_loss`), `src/metrics.py` (`classification_metrics`)
 
-**Slides (2)**
-1. How classification works: encoder features → pooling → linear layer → 3 classes; cross-entropy loss; metrics Precision / Recall / Macro-F1
-2. Results: experiment A vs C vs D (Macro-F1 table), confusion matrix, which classes get confused and why
+**นำเสนอเรื่อง**
+- Classification head: feature จาก encoder → pooling → linear → 3 คลาส, loss แบบ cross-entropy
+- ตัวชี้วัด Precision / Recall / Macro-F1 และผลของการทดลอง A vs C vs D
+- Confusion matrix: คลาสไหนสับสนกับคลาสไหน และทำไม
 
-**Be ready to answer:** Why Macro-F1 and not only accuracy? Which class is hardest and why? Why might segmentation help classification?
+**เตรียมตอบ:** ทำไมใช้ Macro-F1 ไม่ใช่แค่ accuracy? คลาสไหนยากที่สุด เพราะอะไร? ทำไม segmentation ถึงช่วย classification ได้?
 
-## Person 3 — Segmentation
+## 3) การแบ่งบริเวณเนื้องอก (Segmentation)
 
-**Review**
-- [ ] RESULTS.md "Segmentation results"
-- [ ] `results/figures/4_dice_by_tumor_type.png`, `5_dice_vs_tumor_size.png`, `7_*_seg_best_worst.png`
+**ศึกษา**
+- [ ] RESULTS.md หัวข้อ 7 "Segmentation results"
+- [ ] รูป `4_dice_by_tumor_type.png`, `5_dice_vs_tumor_size.png`, `7_*_seg_best_worst.png`
 - [ ] `src/losses.py` (`seg_loss`, `dice_loss`), `src/metrics.py` (`dice_iou_per_image`)
 
-**Slides (2)**
-1. How segmentation works: U-Net decoder, BCE + Dice loss, Dice / IoU metrics
-2. Results: experiment B vs C vs D (Dice table), best and worst examples vs ground truth, Dice by tumor type and size
+**นำเสนอเรื่อง**
+- U-Net decoder, loss แบบ BCE + Dice, ตัวชี้วัด Dice / IoU
+- ผลของการทดลอง B vs C vs D, ภาพที่ดีที่สุด/แย่ที่สุดเทียบ ground truth
+- Dice แยกตามชนิดและขนาดเนื้องอก
 
-**Be ready to answer:** What is Dice? Why BCE + Dice? Why are gliomas the hardest to segment? Why didn't multi-task help segmentation?
+**เตรียมตอบ:** Dice คืออะไร? ทำไมใช้ BCE + Dice? ทำไม glioma ยากที่สุด? ทำไม multi-task ไม่ช่วย segmentation?
 
-## Person 4 — Multi-task Model & Experiments
+## 4) โมเดล Multi-task และการทดลอง
 
-**Review**
-- [ ] RESULTS.md "Method" and "Experiments"
-- [ ] `src/model.py`, `src/train.py`, `MultiTaskLoss` in `src/losses.py`
-- [ ] `results/figures/2_training_curves.png`, `6_uncertainty_weights.png`, `results/tuning_lr_validation.csv`
+**ศึกษา**
+- [ ] RESULTS.md หัวข้อ 3 "Method" และ 4 "Experiments"
+- [ ] `src/model.py`, `src/train.py`, `MultiTaskLoss` ใน `src/losses.py`
+- [ ] รูป `0_architecture.png`, `2_training_curves.png`, `6_uncertainty_weights.png`, ตาราง `tuning_lr_validation.csv`
 
-**Slides (3)**
-1. Architecture diagram (`figures/0_architecture.png`): input → shared ResNet-34 encoder → U-Net decoder (mask) + classification head (type)
-2. Experiments A/B/C/D and why the comparison is fair (same model, data, augmentation, epochs, 3 seeds; lr chosen on validation only)
-3. Training setup table (image size, batch, optimizer, lr, epochs, augmentation) + training curves; how uncertainty weighting works
+**นำเสนอเรื่อง**
+- สถาปัตยกรรม: ภาพ MRI → shared ResNet-34 encoder → U-Net decoder (mask) + classification head (ชนิด)
+- การทดลอง A/B/C/D และทำไมการเปรียบเทียบถึงยุติธรรม (โมเดล ข้อมูล augmentation epoch และ 3 seeds เหมือนกัน)
+- การตั้งค่าการเทรน, การเลือก learning rate จาก validation, uncertainty weighting ทำงานอย่างไร
 
-**Be ready to answer:** What is a shared encoder? What does uncertainty weighting do? How did you choose the learning rate?
+**เตรียมตอบ:** shared encoder คืออะไร? uncertainty weighting ทำอะไร? เลือก learning rate อย่างไร?
 
-## Person 5 — Evaluation & Analysis
+## 5) การประเมินและวิเคราะห์ผล
 
-**Review**
-- [ ] RESULTS.md "Main result", "Error analysis", "Limitations"
-- [ ] `results/figures/1_main_comparison.png`, `results/summary_test.csv`, `results/paired_differences.csv`,
-      `results/errors_by_patient.csv`, `results/error_analysis.json`, `results/figures/7_*_misclassified.png`
+**ศึกษา**
+- [ ] RESULTS.md หัวข้อ 5 "Main result" และ 8 "Error analysis"
+- [ ] รูป `1_main_comparison.png`, `7_*_misclassified.png`
+- [ ] ตาราง `summary_test.csv`, `paired_differences.csv`, `errors_by_patient.csv`
 
-**Slides (3)**
-1. Main result: A/B/C/D comparison (mean ± std over 3 seeds) — does multi-task help each task?
-2. Error analysis: one patient (sellar meningioma) causes most classification errors; misclassified slices are well segmented; worst segmentations are gliomas
-3. Limitations & future work
+**นำเสนอเรื่อง**
+- ตารางผลรวม A–D (mean ± std ของ 3 seeds) และเทียบทีละ seed: multi-task ช่วยแต่ละงานจริงไหม
+- วิเคราะห์ข้อผิดพลาด: ผู้ป่วย 1 คน (meningioma ที่อยู่ตำแหน่งเดียวกับ pituitary) ทำให้ผิดเกือบทั้งหมด,
+  ภาพที่ทายชนิดผิดกลับ segment ได้ดี, ภาพที่ segment แย่ที่สุดเป็น glioma
 
-**Be ready to answer:** Is the difference between models real or just noise? What are the main limitations?
+**เตรียมตอบ:** ความต่างระหว่างโมเดลเป็นของจริงหรือแค่ noise? ทำไมโมเดลสับสน meningioma กับ pituitary?
 
-## Person 6 — Slides, Story & Presentation
+## 6) ภาพรวม ข้อจำกัด และบทสรุป
 
-**Review**
-- [ ] Whole RESULTS.md and README.md
-- [ ] Open the repo as an outsider: is it clear how to run it? (README "Setup" and "Usage")
+**ศึกษา**
+- [ ] RESULTS.md ทั้งหมด โดยเฉพาะหัวข้อ 9 "Limitations" และ 10 "Conclusion"
+- [ ] README.md — ภาพรวมของโค้ด
 
-**Slides (3) + whole deck**
-1. Title (project name, team names, course)
-2. Outline
-3. Conclusion: answer to our question in one sentence + 3 key takeaways
-- Make the template **before** step 3: one font, one colour set (use the experiment colours from the figures: A blue, B orange, C green, D yellow), big text (≥ 18 pt), every chart with title and axis labels
-- Merge everyone's slides, keep style consistent, add slide numbers, time the rehearsal
+**นำเสนอเรื่อง**
+- เปิดเรื่อง: ภาพรวมโปรเจกต์ใน 30 วินาที และสารบัญ
+- ข้อจำกัดของงาน และแนวทางต่อยอด
+- ปิดเรื่อง: คำตอบของคำถามวิจัยใน 1 ประโยค + 3 ข้อสรุปสำคัญ
 
-**Be ready to answer:** Summarise the whole project in 30 seconds.
+**เตรียมตอบ:** สรุปทั้งโปรเจกต์ใน 30 วินาที? ข้อจำกัดหลักคืออะไร? ถ้าทำต่อจะทำอะไร? เอาไปใช้ในโรงพยาบาลได้เลยไหม?
 
 ---
 
-## Slide order (≈ 16 slides, ≈ 12–15 minutes)
+## ทำสไลด์ร่วมกัน
 
-| # | Slide | Person | Rubric item |
-|---|---|---|---|
-| 1 | Title | 6 | – |
-| 2 | Outline | 6 | – |
-| 3 | Problem & goal | 1 | Problem & data (2) |
-| 4 | Dataset | 1 | Problem & data |
-| 5 | Patient-level split & leakage fix | 1 | Problem & data |
-| 6 | Architecture (shared encoder + 2 heads) | 4 | Difficulty (4): multi-task |
-| 7 | Experiments A–D & fair comparison | 4 | Model & experiments (2) |
-| 8 | Training setup & curves | 4 | Model & experiments |
-| 9 | Classification method | 2 | Model & experiments |
-| 10 | Segmentation method | 3 | Model & experiments |
-| 11 | Main result A/B/C/D | 5 | Evaluation (2) |
-| 12 | Classification results + confusion matrix | 2 | Evaluation |
-| 13 | Segmentation results + examples vs ground truth | 3 | Evaluation |
-| 14 | Error analysis | 5 | Evaluation |
-| 15 | Limitations & future work | 5 | Evaluation |
-| 16 | Conclusion | 6 | – |
+**ตกลงกันก่อนเริ่ม**
+- ใช้ template เดียว ฟอนต์เดียว ตัวอักษรใหญ่ (≥ 18 pt)
+- สีของการทดลองให้ตรงกับรูป: A ฟ้า, B ส้ม, C เขียว, D เหลือง
+- ทุกกราฟ/ตารางมีชื่อ ป้ายกำกับแกน และบอกว่าเป็นผลบน test set
+- 1 สไลด์ = 1 ประเด็น ใช้รูปแทนข้อความยาว ๆ
+- ใส่เลขหน้า
 
-The other two rubric items are **slide design (2)** (Person 6 keeps it clean and consistent) and
-**presentation & Q&A (3)** (everyone presents their part and answers questions).
+**ลำดับสไลด์ (~16 หน้า, 12–15 นาที)**
+
+| # | สไลด์ | รูปที่ใช้ | หัวข้อ | เกณฑ์ที่ได้คะแนน |
+|---|---|---|---|---|
+| 1 | ชื่อโปรเจกต์ + สมาชิก | – | 6 | – |
+| 2 | ภาพรวมและสารบัญ | – | 6 | – |
+| 3 | ที่มาของปัญหาและเป้าหมาย | – | 1 | กำหนดปัญหาและเตรียมข้อมูล (2) |
+| 4 | Dataset | `0_dataset_examples.png` | 1 | กำหนดปัญหาและเตรียมข้อมูล |
+| 5 | แบ่งข้อมูลตามผู้ป่วย + แก้ leakage | ตารางจาก RESULTS.md | 1 | กำหนดปัญหาและเตรียมข้อมูล |
+| 6 | สถาปัตยกรรม (shared encoder + 2 heads) | `0_architecture.png` | 4 | ความยาก (4): Multi-task |
+| 7 | การทดลอง A–D และความยุติธรรม | ตารางจาก RESULTS.md | 4 | พัฒนาแบบจำลองและการทดลอง (2) |
+| 8 | การตั้งค่าการเทรน + กราฟการเทรน | `2_training_curves.png` | 4 | พัฒนาแบบจำลองและการทดลอง |
+| 9 | วิธี Classification | – | 2 | พัฒนาแบบจำลองและการทดลอง |
+| 10 | วิธี Segmentation | – | 3 | พัฒนาแบบจำลองและการทดลอง |
+| 11 | ผลหลัก A/B/C/D | `1_main_comparison.png` | 5 | ประเมินและวิเคราะห์ผล (2) |
+| 12 | ผล Classification + confusion matrix | `3_confusion_matrices.png` | 2 | ประเมินและวิเคราะห์ผล |
+| 13 | ผล Segmentation + ภาพเทียบ ground truth | `4_dice_by_tumor_type.png`, `7_*_seg_best_worst.png` | 3 | ประเมินและวิเคราะห์ผล |
+| 14 | วิเคราะห์ข้อผิดพลาด | `7_*_misclassified.png` | 5 | ประเมินและวิเคราะห์ผล |
+| 15 | ข้อจำกัดและแนวทางต่อยอด | – | 6 | ประเมินและวิเคราะห์ผล |
+| 16 | บทสรุป | – | 6 | – |
+
+อีก 2 เกณฑ์คือ **ความสวยงามของสื่อ (2)** (ทำสไลด์ร่วมกันให้สไตล์เดียวกัน) และ
+**การนำเสนอและตอบคำถาม (3)** (ทุกคนพูดส่วนของตัวเองและช่วยกันตอบคำถาม)

@@ -16,65 +16,91 @@ Main question: *does learning where the tumor is help classify its type (and vic
 
 - Download: <https://figshare.com/articles/dataset/brain_tumor_dataset/1512427> (4 zip files)
 - Do **not** use the Kaggle "Brain Tumor MRI" re-uploads: they have no masks and no patient IDs.
-- Citation: Cheng J. et al., "Enhanced Performance of Brain Tumor Classification via Tumor Region Augmentation and Partition", PLoS ONE 10(10), 2015.
+- Citation: Cheng J. et al., ["Enhanced Performance of Brain Tumor Classification via Tumor Region Augmentation and Partition"](https://doi.org/10.1371/journal.pone.0140381), PLoS ONE 10(10), 2015.
+- Acquisition sites: Nanfang Hospital and General Hospital, Tianjin Medical University (two hospitals).
 
 Put all extracted `.mat` files under `data/raw/` (sub-folders are fine). The `data/` folder is git-ignored.
 On Colab, keep data and runs in a shared Google Drive folder.
 
 ## Setup
 
-**Colab / Kaggle:** use `notebooks/colab_train.ipynb` (installs what it needs).
+**Colab:** use `notebooks/colab_train.ipynb`. Kaggle needs its own data paths; the Colab Drive-mount cell does not run there.
 
 **Local machine with an NVIDIA GPU (Windows):**
 
-```bash
-python -m venv C:/Users/<you>/.venvs/dlmed
-C:/Users/<you>/.venvs/dlmed/Scripts/python -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
-C:/Users/<you>/.venvs/dlmed/Scripts/python -m pip install -r requirements.txt
-C:/Users/<you>/.venvs/dlmed/Scripts/python -c "import torch; print(torch.cuda.is_available(), torch.cuda.get_device_name(0))"
+Run from the `DLMED` folder in **PowerShell**:
+
+```powershell
+python -m venv "$env:USERPROFILE/.venvs/dlmed"
+$dlmedPython = "$env:USERPROFILE/.venvs/dlmed/Scripts/python.exe"
+& $dlmedPython -m pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+& $dlmedPython -m pip install -r requirements.txt
+& $dlmedPython -c "import torch; print('GPU available:', torch.cuda.is_available()); print(torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 ```
 
+- On Guy's laptop the environment already exists: start with the `$dlmedPython = ...` line; no reinstall is needed.
+- Use `& $dlmedPython` for every Python command below. In a new PowerShell window, set that variable again.
+- `requirements-lock.txt` records the Windows / Python 3.14.7 environment verified in the 2026-10-10 review.
+  To install those exact package versions instead of the portable minimums, use
+  `& $dlmedPython -m pip install -r requirements-lock.txt --extra-index-url https://download.pytorch.org/whl/cu128`.
 - RTX 50-series GPUs need the CUDA 12.8 build (`cu128`) as above; older GPUs also work with it.
 - If DataLoader workers cause errors on Windows, add `--workers 0`.
 
 ## Usage
 
-```bash
+```powershell
 # 1. Convert .mat -> PNG (splits/splits.csv is already committed and is kept as is)
-python src/prepare_data.py --raw_dir data/raw/mat --out_dir data/processed
+& $dlmedPython src/prepare_data.py --raw_dir data/raw/mat --out_dir data/processed
 
-# 2. Train one experiment (best epoch picked on validation)
-python src/train.py --tasks both --name C_mtl_equal_seed0
+# 2. Short trial in a separate folder (best epoch picked on validation)
+& $dlmedPython src/train.py --tasks both --epochs 2 --name C_demo_seed0 --out_dir runs/demo
 
-# 3. Evaluate on the held-out test set
-python src/evaluate.py --run runs/C_mtl_equal_seed0
+# 3. Inspect the trial on validation; reserve test for the final experiments
+& $dlmedPython src/evaluate.py --run runs/demo/C_demo_seed0 --split val
 
-# 4. Learning-rate tuning on validation, then all experiments x 3 seeds
-bash scripts/tune_lr.sh
-bash scripts/run_experiments.sh
+# 4. Rebuild the published tables/figures from the original saved runs (Guy's laptop)
+& $dlmedPython src/analyze.py --runs_dir runs --out_dir results
 
-# 5. Final tables + slide figures -> results/
-python src/analyze.py --runs_dir runs --out_dir results
+# 5. Regression checks
+& $dlmedPython -m unittest discover -s tests -v
 ```
 
-Colab: open `notebooks/colab_train.ipynb`.
+**Existing run folders are protected.** A repeated name exits without modifying that run. Choose another
+`--name` or a new `--out_dir`; there is no automatic overwrite or resume.
 
-## Data split (no patient leakage)
+To repeat the full protocol, install **Git for Windows** for `bash`, and use new folders:
+
+```powershell
+# Let the Bash scripts find the same Python environment
+$env:PATH = "$(Split-Path -Parent $dlmedPython);$env:PATH"
+bash scripts/tune_lr.sh --out_dir runs/reproduced/tuning --workers 4
+# Choose lr from your validation results first; 3e-4 was the original choice
+bash scripts/run_experiments.sh --out_dir runs/reproduced/final --lr 3e-4 --workers 4
+& $dlmedPython src/analyze.py --runs_dir runs/reproduced/final --out_dir runs/reproduced/results
+```
+
+Code, summary tables and figures are on GitHub. Data and trained checkpoints are git-ignored and stay on Guy's
+laptop; teammates who want to run evaluation need those files or must download the dataset and train anew.
+
+## Data split (separate patient groups)
 
 Slices from the same patient are near-duplicates, so the split is done **by patient**
-(`StratifiedGroupKFold`, grouped by `PID`, stratified by tumor type): about 70 / 15 / 15 % train / val / test.
-`prepare_data.py` asserts that no patient appears in two splits.
+(`StratifiedGroupKFold`, grouped by the conservative `patient` column, stratified by tumor type):
+about 70 / 15 / 15 % train / val / test. No recorded ID or conservative group crosses the committed splits.
 
-The dataset lists 233 patient IDs, but 18 glioma IDs appear with letter suffixes
-(e.g. `MR040240`, `MR040240B`, `MR040240C`, `MR040240D`), which look like repeat scans of the same person.
-With raw IDs, 14 of these groups ended up spread over train/val/test. We therefore merge suffixed IDs
-(`patient` column) and split on that: **209 patients → train 151 / val 29 / test 29 (2,194 / 434 / 436 images)**.
+The dataset reports 233 patients and contains 233 distinct PID strings. Eighteen groups of glioma IDs have
+letter-suffixed variants (e.g. `MR040240`, `MR040240B`, `MR040240C`, `MR040240D`). They may be related scans;
+their shared identity has **not** been confirmed by the dataset authors. Fourteen such groups crossed the initial
+raw-ID split. We conservatively keep each group together to reduce possible leakage:
+**209 groups → train 151 / val 29 / test 29 (2,194 / 434 / 436 images)**.
+This is a grouping rule, not a corrected count of real patients. The `patients` columns in
+`splits/data_summary.csv` count these groups; the CSV schema is kept for compatibility.
 **Everyone uses the committed `splits/splits.csv`.** The test set is only used after all settings are chosen on validation.
 
 ## Experiments
 
 All experiments use the same model (`src/model.py`: U-Net, ResNet-34 ImageNet encoder, classification head on the
-deepest encoder features), the same data, augmentation, epochs and seeds. Single-task baselines switch the other loss off.
+deepest encoder features), the same data, augmentation policy, epochs and seed labels. Single-task baselines switch the other loss off.
 
 | ID | Command | Purpose |
 |---|---|---|
@@ -89,11 +115,19 @@ Settings (lr chosen on validation from 1e-4 / 3e-4 / 1e-3, see `results/tuning_l
 Segmentation loss = BCE + Dice; classification loss = cross-entropy.
 Augmentation (train only, applied to image and mask together): horizontal flip, affine (scale ±10 %, shift ±5 %, rotate ±15°), brightness/contrast.
 
+**Original results vs corrected training:** the published 12 runs were trained before augmentation seeding was fixed.
+Their checkpoints and scores were verified on 2026-10-10 and are preserved. Their seed labels do **not** guarantee
+identical augmentation draws or an exact retraining replay; per-seed differences are descriptive comparisons.
+New runs seed Albumentations, each worker and the training sampler, and save `environment.txt`.
+Keep software versions, worker count and hardware fixed when checking repeatability; bitwise equality across
+GPUs or library versions is not guaranteed. New runs must be reported separately from the original results.
+
 ## Outputs (per run, in `runs/<name>/`)
 
 | File | Content |
 |---|---|
 | `config.json` | all settings of the run |
+| `environment.txt` | Python / CUDA version and installed package versions (new runs only) |
 | `history.csv` | train losses and validation metrics per epoch |
 | `best.pt` | checkpoint of the best validation epoch |
 | `test_metrics.json` | test metrics for the trained task(s), incl. per-class F1 and per-tumor-type Dice |

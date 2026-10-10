@@ -15,23 +15,23 @@ from torch.utils.data import Dataset
 MEAN, STD = 0.449, 0.226
 
 
-def get_transforms(train, size):
+def get_transforms(train, size, seed=0):
     if train:
         return A.Compose([
             A.Resize(size, size),
             A.HorizontalFlip(p=0.5),
             A.Affine(scale=(0.9, 1.1), translate_percent=(-0.05, 0.05), rotate=(-15, 15), p=0.5),
             A.RandomBrightnessContrast(brightness_limit=0.15, contrast_limit=0.15, p=0.5),
-        ])
+        ], seed=seed)
     return A.Compose([A.Resize(size, size)])
 
 
 class BrainTumorDataset(Dataset):
-    def __init__(self, data_dir, splits_csv, split, size=256, train=False):
+    def __init__(self, data_dir, splits_csv, split, size=256, train=False, seed=0):
         self.data_dir = Path(data_dir)
         df = pd.read_csv(splits_csv, dtype={"id": str, "pid": str})
         self.df = df[df.split == split].reset_index(drop=True)
-        self.tf = get_transforms(train, size)
+        self.tf = get_transforms(train, size, seed)
 
     def __len__(self):
         return len(self.df)

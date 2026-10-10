@@ -3,10 +3,11 @@
 Project: Brain Tumor Segmentation + Tumor-Type Classification (Multi-task Learning, 4-point difficulty level).
 Team plan: [TASKS.md](TASKS.md) · Results: [results/RESULTS.md](results/RESULTS.md) · How to run: [README.md](README.md)
 
-## Status: project finished (2026-10-09) — team review and slides next
+## Status: original experiments verified — team review, slides and rehearsal remain (2026-10-10)
 
-**Headline:** multi-task learning improved classification (Macro-F1 0.916 → 0.938, better in 3/3 seeds) and kept
-segmentation equal (Dice 0.774 vs 0.775). Equal loss weights beat learned (uncertainty) weights.
+**Headline:** multi-task had higher classification scores in the original runs (Macro-F1 0.916 → 0.938,
+higher for 3/3 matched seed labels), with similar mean Dice (0.774 vs 0.775). This is not an equivalence test.
+Current fixes and checks: [codextodo.md](codextodo.md). The original results predate augmentation seeding.
 
 ## Done
 
@@ -15,13 +16,16 @@ segmentation equal (Dice 0.774 vs 0.775). Equal loss weights beat learned (uncer
   (data prep, shared-encoder model, training `--tasks cls/seg/both`, fixed/uncertainty loss weighting, evaluation, Colab notebook)
 - [x] **2026-10-09** Smoke-tested the pipeline on fake data; set up the local GPU environment (RTX 5070 Laptop, PyTorch 2.11 + CUDA 12.8)
 - [x] **2026-10-09** Downloaded the Figshare dataset (checksums verified) → `DLMED/data/` (git-ignored); 3,064 images, masks checked visually
-- [x] **2026-10-09** Found and fixed patient leakage (suffixed glioma IDs = same person) → 209 patients, split 151 / 29 / 29
+- [x] **2026-10-09** Grouped suffixed glioma IDs conservatively to reduce possible leakage → 209 groups, split 151 / 29 / 29; shared identity is unverified
 - [x] **2026-10-09** Learning rate chosen on validation only (1e-4 / **3e-4** / 1e-3) → `results/tuning_lr_validation.csv`
 - [x] **2026-10-09** Final experiments A–D × 3 seeds (12 runs, ≈ 7 min each) + test evaluation
 - [x] **2026-10-09** Analysis: summary table, per-seed comparison, per-class / per-type / per-size results,
-  error analysis by patient (one sellar meningioma patient = most classification errors), learned weights
+  error analysis by patient ID (one ID accounts for most classification errors), learned weights; clinical causes are hypotheses
 - [x] **2026-10-09** 10 slide-ready figures in `results/figures/` (architecture, dataset, main result, curves, confusion matrices, Dice by type/size, weights, examples)
 - [x] **2026-10-09** Wrote `results/RESULTS.md` (findings, limitations, Q&A answers) and rewrote `TASKS.md` as a review + slides plan
+- [x] **2026-10-10** Reviewed raw data, splits, saved predictions and all 12 checkpoints; full test inference matches the original reported outputs
+- [x] **2026-10-10** Corrected grouping/hospital/statistical/clinical claims and separated original results from the new training protocol; implementation checks are recorded in `codextodo.md`
+- [x] **2026-10-10** Fixed run-folder protection, augmentation/worker seeding and Windows instructions; three regression tests and a real-data two-epoch GPU/validation check passed. All 104 archived files checked by hash are unchanged.
 
 ## Todo (me)
 
@@ -41,3 +45,4 @@ segmentation equal (Dice 0.774 vs 0.775). Equal loss weights beat learned (uncer
 - Python env: `C:/Users/guymy/.venvs/dlmed/Scripts/python`
 - Data: `DLMED/data/` · trained runs + checkpoints: `DLMED/runs/` (both git-ignored, stay on this laptop)
 - Rebuild results after any change: `python src/analyze.py --runs_dir runs --out_dir results`
+- For Windows use the environment-specific Python commands in README; new experiments need a new output folder and a separate report.

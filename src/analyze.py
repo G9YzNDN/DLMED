@@ -350,7 +350,7 @@ def errors_by_patient(runs, meta):
 
 
 def paired_differences(df):
-    """Per-seed difference multi-task minus single-task (same seed = same data order/init)."""
+    """Descriptive differences matched by seed label; original augmentations were not seeded."""
     rows = []
     for mtl in ("C_mtl_equal", "D_mtl_uncert"):
         for base, metric in (("A_cls", "macro_f1"), ("B_seg", "dice")):

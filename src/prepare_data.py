@@ -36,8 +36,7 @@ def read_mat(path):
 
 def patient_group(pid):
     """Some glioma IDs come with letter suffixes (MR040240, MR040240B, MR040240C ...).
-    These look like repeat scans of the same person, so they are treated as one patient
-    to keep all of that person's slices in the same split."""
+    Conservatively group variants to reduce possible leakage; shared identity is unverified."""
     return re.sub(r"^(MR\d+)[A-Z]$", r"\1", pid)
 
 
@@ -62,7 +61,7 @@ def split_by_patient(meta, test_frac, val_frac, seed):
     _, val_idx = next(sgkf.split(tv, tv["label"].values, tv["patient"].values))
     meta.loc[tv.index[val_idx], "split"] = "val"
 
-    # No patient may appear in more than one split
+    # No conservative patient group may appear in more than one split.
     pids = {s: set(meta.loc[meta.split == s, "patient"]) for s in ("train", "val", "test")}
     assert not (pids["train"] & pids["val"]), "patient leak train/val"
     assert not (pids["train"] & pids["test"]), "patient leak train/test"
@@ -121,7 +120,7 @@ def main():
     meta.insert(4, "patient", meta.pid.map(patient_group))
     meta.to_csv(out / "metadata.csv", index=False)
     print(f"Converted {len(meta)} images from {meta.pid.nunique()} patient IDs "
-          f"-> {meta.patient.nunique()} patients after merging suffixed IDs")
+          f"-> {meta.patient.nunique()} conservative groups after merging suffixed IDs")
     if (meta.tumor_area == 0).any():
         print(f"WARNING: {(meta.tumor_area == 0).sum()} images have an empty mask")
 

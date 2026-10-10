@@ -11,13 +11,15 @@ The best epoch is chosen on the validation set. The test set is never touched he
 import argparse
 import json
 import random
+import subprocess
+import sys
 import time
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 import torch
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, get_worker_info
 
 from dataset import BrainTumorDataset
 from engine import predict, selection_score
@@ -64,19 +66,33 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)
 
 
+def seed_worker(_worker_id):
+    # Albumentations owns its RNG; each worker needs a distinct, repeatable seed.
+    get_worker_info().dataset.tf.set_random_seed(torch.initial_seed() % (2**32))
+
+
 def main():
     args = get_args()
     set_seed(args.seed)
     device = "cuda" if torch.cuda.is_available() else "cpu"
     run_dir = Path(args.out_dir) / args.name
-    run_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        run_dir.mkdir(parents=True, exist_ok=False)
+    except FileExistsError:
+        raise SystemExit(f"Run folder already exists: {run_dir}. Choose a new --name or --out_dir.") from None
     (run_dir / "config.json").write_text(json.dumps(vars(args), indent=2))
+    packages = subprocess.check_output([sys.executable, "-m", "pip", "freeze"], text=True)
+    (run_dir / "environment.txt").write_text(
+        f"# Python {sys.version.split()[0]}; CUDA runtime {torch.version.cuda}; device {device}\n" + packages,
+        encoding="utf-8",
+    )
     print(f"Run: {run_dir}  device: {device}")
 
-    train_ds = BrainTumorDataset(args.data_dir, args.splits, "train", args.size, train=True)
+    train_ds = BrainTumorDataset(args.data_dir, args.splits, "train", args.size, train=True, seed=args.seed)
     val_ds = BrainTumorDataset(args.data_dir, args.splits, "val", args.size)
     train_dl = DataLoader(train_ds, args.batch_size, shuffle=True, num_workers=args.workers,
-                          pin_memory=True, drop_last=True, persistent_workers=args.workers > 0)
+                          pin_memory=True, drop_last=True, persistent_workers=args.workers > 0,
+                          worker_init_fn=seed_worker, generator=torch.Generator().manual_seed(args.seed))
     val_dl = DataLoader(val_ds, args.batch_size, num_workers=args.workers, pin_memory=True,
                         persistent_workers=args.workers > 0)
     print(f"train {len(train_ds)}  val {len(val_ds)} images")

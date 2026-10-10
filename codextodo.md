@@ -46,7 +46,10 @@ different GPUs is not guaranteed.
 ## Team still needs to do before submission
 
 - [x] GUY chose Topic 4 — Multi-task modelling and experiments.
-- [ ] Remaining members choose their topics and fill in their names in TASKS.md.
+- [x] P chose Topic 2 — Tumor-type classification.
+- [x] Men chose Topic 3 — Tumor segmentation.
+- [x] Build chose Topic 5 — Evaluation and error analysis.
+- [ ] Assign Topic 1 (problem and data) and Topic 6 (overview, limitations and conclusion) in TASKS.md.
 - [ ] Read the corrected results and practise explaining the model, split, metrics and limitations.
 - [ ] Create the slides together, with sources and readable figures. Label train/validation/test correctly.
 - [ ] Include both task outputs and metrics, A–D comparisons, correct/wrong examples and limitations.

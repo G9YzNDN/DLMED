@@ -1,0 +1,7 @@
+comparison,seed,metric,difference
+C_mtl_equal - A_cls,0,macro_f1,0.012036352857582866
+C_mtl_equal - A_cls,1,macro_f1,0.017777485012929972
+C_mtl_equal - A_cls,2,macro_f1,0.03606027893381547
+D_mtl_uncert - A_cls,0,macro_f1,0.009724732612341525
+D_mtl_uncert - A_cls,1,macro_f1,0.005967556776611871
+D_mtl_uncert - A_cls,2,macro_f1,0.006504734101176357

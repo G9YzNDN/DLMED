@@ -1,0 +1,26 @@
+{
+  "source_experiment_commit": "74170a0e5036fc1af0bae10b25a5196249a0add0",
+  "sources": {
+    "results/all_runs_test.csv": "e6ef168623d86407dca1fe2c15d0a4cce49be7102b2029914df0915e960b0dba",
+    "results/errors_by_patient.csv": "0111e3c4c98f418bf6cbc27a214d2879d3ab4a438f32609169699c758279d9c3",
+    "results/summary_test.csv": "2dd254ad0920bf73a9d4cf5fa0b57de4eb47642fb512ab75863a6d9bbd023674"
+  },
+  "script_sha256": "ccb17cc9488d3b385c2fa2df1f94641be31d5a18383e1b5f4c6f85b57b8976be",
+  "method": "arithmetic aggregation of committed per-run metrics; sample SD (ddof=1)",
+  "seed_labels": [
+    0,
+    1,
+    2
+  ],
+  "test_slices": 436,
+  "checks": [
+    "finite metrics in [0,1]",
+    "unique matching seeds",
+    "Macro-F1 equals mean per-class F1",
+    "means and SD match reference at 4 decimals",
+    "patient error totals agree with accuracy",
+    "known-patient analysis unchanged"
+  ],
+  "new_training_performed": false,
+  "new_inference_performed": false
+}

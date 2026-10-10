@@ -171,6 +171,7 @@ def report_text(summary, paired, totals, patient_rows, n_slices, source_commit):
               f"Rows = true classes; columns = predicted classes. Each panel pools {n_slices * n_seeds:,} predictions over {n_seeds} seeds on the same {n_slices} slices. These are not independent images/patients. Aggregate scores cannot reconstruct the underlying matrix; this is the existing project figure.", "",
               "## Limits and reproducibility", "",
               "- Only one fixed patient-group split, 29 test groups and three recorded seeds; no formal statistical significance test or equivalence test was performed.",
+              "- The original runs preceded the Albumentations-seeding fix; seed labels did not control augmentation draws. Corrected seeding applies to new training only, and the recorded-seed differences above are descriptive comparisons.",
               "- The learning rate was chosen on C only and reused for A/D; checkpoint selection also differs between single-task and joint models.",
               "- Suffix-based patient grouping is a conservative assumption about identifiers, not independently verified patient identity.",
               "- Classification covers three tumor types and has no healthy class; per-slice softmax probabilities were not evaluated for calibration.",

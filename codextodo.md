@@ -21,6 +21,7 @@ Team plan: [TASKS.md](TASKS.md) · Results: [results/RESULTS.md](results/RESULTS
 - [x] **Correct data claims:** two acquisition hospitals; 233 recorded IDs → 209 conservative groups. Shared identity behind suffix variants remains unverified.
 - [x] **Correct conclusions:** similar mean Dice is not proof of equivalence; clinical explanations and reasons D underperforms C remain hypotheses.
 - [x] **Update team plan and older log:** keep the six review topics, shared slide work and rehearsal; explain the original-run limitation throughout.
+- [x] **Keep the latest team additions:** preserve the classification study materials, align their rounding and limitations, and record **GUY** as responsible for **Topic 4 — Multi-task modelling and experiments** in TASKS.md.
 
 ## Verification of these fixes
 
@@ -28,7 +29,8 @@ Team plan: [TASKS.md](TASKS.md) · Results: [results/RESULTS.md](results/RESULTS
 - [x] Two-epoch multi-task uncertainty-weighted GPU check on real data (2,194 train / 434 validation images, two workers, no pretrained weights), followed by validation evaluation. Outputs: `runs/review_checks/gpu_fix_check_seed0/` (git-ignored). This is a pipeline check, not a new final experiment.
 - [x] SHA-256 comparison of 104 original experiment/result/split files passed; archived checkpoints, predictions, histories, tables, figures and split CSVs are unchanged.
 - [x] Python syntax, notebook structure, all three README PowerShell blocks, Bash syntax and paths containing spaces passed. No original score was replaced by the short GPU check.
-- [ ] Commit and push the reviewed fixes to GitHub.
+- [x] Regenerated classification reports with their built-in input checks; classification numeric tables stayed unchanged. Verified report hashes, local document links and GUY's topic assignment.
+- [x] Commit and push the reviewed fixes to GitHub.
 
 ## Important distinction for the presentation
 
@@ -43,7 +45,8 @@ different GPUs is not guaranteed.
 
 ## Team still needs to do before submission
 
-- [ ] Choose a topic each and fill in the names in TASKS.md.
+- [x] GUY chose Topic 4 — Multi-task modelling and experiments.
+- [ ] Remaining members choose their topics and fill in their names in TASKS.md.
 - [ ] Read the corrected results and practise explaining the model, split, metrics and limitations.
 - [ ] Create the slides together, with sources and readable figures. Label train/validation/test correctly.
 - [ ] Include both task outputs and metrics, A–D comparisons, correct/wrong examples and limitations.

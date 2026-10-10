@@ -69,3 +69,5 @@ Training uses only train data. [train.py](../src/train.py) selects the checkpoin
 The committed split has 436 test slices from 29 patient groups. Suffix-based grouping is a conservative repository assumption about related IDs; absence of cross-split group overlap does not independently prove patient identities.
 
 Experiments share an architecture, split, settings and seed labels. These controls support comparison, but the learning rate was tuned on C only and the checkpoint-selection criteria differ by task. Matching seed labels does not independently verify identical augmentation or GPU computations. Three seeds estimate training variability on one fixed split; they do not measure generalisation across new patient splits.
+
+The original 12 runs did not seed Albumentations' internal random generator. Their checkpoints and scores are preserved; the corrected training code seeds augmentation, workers and the sampler for new runs only. Differences by recorded seed label are descriptive comparisons, not matched augmentation trials or an exact replay of the corrected protocol.

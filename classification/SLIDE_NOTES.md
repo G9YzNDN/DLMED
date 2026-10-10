@@ -27,7 +27,7 @@ Use the team's shared deck template. These are content drafts for slides **9 and
 
 | A: Classification only | C: Multi-task equal | D: Multi-task uncertainty |
 |---|---|---|
-| 0.916 ± 0.010 | **0.938 ± 0.003** | 0.924 ± 0.012 |
+| 0.916 ± 0.010 | **0.938 ± 0.003** | 0.923 ± 0.012 |
 
 **Two takeaways:**
 
@@ -40,7 +40,7 @@ Use the team's shared deck template. These are content drafts for slides **9 and
 
 **Speaking notes (Thai):**
 
-“ผลบน test set แสดงว่าโมเดลที่ฝึก classification อย่างเดียวมี Macro-F1 เฉลี่ยประมาณ 0.916 ส่วน multi-task ที่ให้น้ำหนักสองงานเท่ากันได้ 0.938 เพิ่มขึ้นประมาณ 0.022 และดีกว่าทั้งสาม seeds ครับ แบบเรียนรู้น้ำหนักอัตโนมัติได้ประมาณ 0.924 สำหรับ confusion matrix แถวคือคลาสจริง และคอลัมน์คือคลาสที่ทำนาย จุดบนแนวทแยงคือคำตอบที่ถูก คลาสที่ยากที่สุดคือ meningioma โดยผู้ป่วยหนึ่งกลุ่มถูกทายเป็น pituitary ทั้ง 18 ภาพในทุก seed รวม 54 จาก 63 ข้อผิดพลาดของโมเดล C การกำกับบริเวณเนื้องอกอาจช่วย encoder เรียนคุณลักษณะที่จำแนกได้ดีขึ้น แต่เรายังไม่ได้พิสูจน์กลไกนี้ และผลจากสาม seeds กับผู้ป่วย test 29 กลุ่มยังไม่ใช่ข้อสรุปเรื่องนัยสำคัญทางสถิติครับ”
+“ผลบน test set แสดงว่าโมเดลที่ฝึก classification อย่างเดียวมี Macro-F1 เฉลี่ยประมาณ 0.916 ส่วน multi-task ที่ให้น้ำหนักสองงานเท่ากันได้ 0.938 เพิ่มขึ้นประมาณ 0.022 และดีกว่าทั้งสาม seeds ครับ แบบเรียนรู้น้ำหนักอัตโนมัติได้ประมาณ 0.923 สำหรับ confusion matrix แถวคือคลาสจริง และคอลัมน์คือคลาสที่ทำนาย จุดบนแนวทแยงคือคำตอบที่ถูก คลาสที่ยากที่สุดคือ meningioma โดยผู้ป่วยหนึ่งกลุ่มถูกทายเป็น pituitary ทั้ง 18 ภาพในทุก seed รวม 54 จาก 63 ข้อผิดพลาดของโมเดล C การกำกับบริเวณเนื้องอกอาจช่วย encoder เรียนคุณลักษณะที่จำแนกได้ดีขึ้น แต่เรายังไม่ได้พิสูจน์กลไกนี้ และผลจากสาม seeds กับผู้ป่วย test 29 กลุ่มยังไม่ใช่ข้อสรุปเรื่องนัยสำคัญทางสถิติครับ”
 
 ## Backup material
 
@@ -54,4 +54,5 @@ Use the team's shared deck template. These are content drafts for slides **9 and
 - Say “+0.022 Macro-F1,” not “accuracy improved by 2.2%.”
 - Say “lowest F1 in this test split,” not “meningioma is always hardest.”
 - Describe location/appearance explanations as hypotheses from the repository analysis, not confirmed radiological findings.
+- Explain that the original runs preceded the augmentation-seeding fix; same seed labels did not control augmentation draws.
 - Do not remove the difficult patient from the main comparison or describe pooled seeds as independent test subjects.

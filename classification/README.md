@@ -53,11 +53,13 @@ Additional example: [misclassified MRI slices](../results/figures/7_C_mtl_equal_
 With the original data prepared and the project dependencies installed, use the existing pipeline:
 
 ```bash
-python src/train.py --tasks cls --seed 0 --name A_cls_seed0
-python src/evaluate.py --run runs/A_cls_seed0
+python src/train.py --tasks cls --seed 0 --name A_cls_seed0 --out_dir runs/classification_trials
+python src/evaluate.py --run runs/classification_trials/A_cls_seed0 --split test
 ```
 
 Follow the root [README.md](../README.md) for data preparation and all A–D experiments. Data and checkpoints are not committed. Regenerating these tables verifies arithmetic on recorded results; it does not independently reproduce training or per-image predictions.
+
+Use a fresh output folder; training refuses existing run folders. On Windows, use the explicit environment Python shown in the root README. New training uses corrected augmentation seeding, so it cannot exactly replay the original unseeded augmentation draws.
 
 ## Before presenting
 
@@ -65,5 +67,5 @@ Follow the root [README.md](../README.md) for data preparation and all A–D exp
 - Explain how segmentation supervision reaches the classifier through the shared encoder.
 - Distinguish Macro-F1 from the harmonic mean of macro precision and macro recall.
 - Read the confusion matrix axes and pooled-seed counts correctly.
-- Describe limitations: 29 test patient groups, three seeds, no healthy class, and learning-rate tuning on C only.
+- Describe limitations: 29 test patient groups, three seeds, no healthy class, learning-rate tuning on C only, and uncontrolled augmentation randomness in the original runs.
 - Use full-test-set scores in the main comparison; keep all difficult cases in the test set.

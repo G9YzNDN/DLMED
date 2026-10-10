@@ -123,3 +123,6 @@ results/              final results: RESULTS.md, tables, figures (committed)
 ## Team
 
 Who reviews what, slide order and Q&A preparation: see [TASKS.md](TASKS.md).
+
+Topic 2 classification materials: [classification/README.md](classification/README.md) — method notes, reproducible A/C/D result tables, slide 9/12 copy, Thai speaking notes and Q&A. Regenerate tables with `python classification/report.py` (standard library only; uses the recorded result CSVs).
+

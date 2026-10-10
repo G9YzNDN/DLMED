@@ -58,6 +58,7 @@
 ## 2) การจำแนกชนิดเนื้องอก (Classification)
 
 **ศึกษา**
+- [ ] [classification/README.md](classification/README.md) — คำอธิบายโมเดล ตารางผล A/C/D เนื้อหาสไลด์ 9/12 บทพูดภาษาไทย และ Q&A; สร้างตารางซ้ำด้วย `python classification/report.py`
 - [ ] RESULTS.md หัวข้อ 6 "Classification results"
 - [ ] รูป `3_confusion_matrices.png`
 - [ ] `src/losses.py` (`cls_loss`), `src/metrics.py` (`classification_metrics`)
@@ -158,3 +159,4 @@
 
 อีก 2 เกณฑ์คือ **ความสวยงามของสื่อ (2)** (ทำสไลด์ร่วมกันให้สไตล์เดียวกัน) และ
 **การนำเสนอและตอบคำถาม (3)** (ทุกคนพูดส่วนของตัวเองและช่วยกันตอบคำถาม)
+
